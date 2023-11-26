@@ -1,0 +1,68 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model Genre {
+  id    String  @id
+  name  String  @unique
+  url   String  @unique
+  Track Track[]
+}
+
+model Artist {
+  id              String            @id
+  name            String
+  url             String            @unique
+  Track           Track[]
+  ArtistsOnTracks ArtistsOnTracks[]
+}
+
+model Label {
+  id    String  @id
+  name  String
+  url   String  @unique
+  Track Track[]
+}
+
+model Track {
+  id              String            @id
+  name            String
+  artist          Artist[]
+  label           Label             @relation(fields: [labelId], references: [id])
+  labelId         String
+  genre           Genre             @relation(fields: [genreId], references: [id])
+  genreId         String
+  File            File[]
+  isOriginalMix   Boolean
+  length          Int
+  releaseDate     DateTime
+  bpm             Int
+  key             String
+  url             String
+  price           String
+  artWorkUrl      String
+  ArtistsOnTracks ArtistsOnTracks[]
+}
+
+model ArtistsOnTracks {
+  id       String @id
+  track    Track  @relation(fields: [trackId], references: [id])
+  trackId  String
+  artist   Artist @relation(fields: [artistId], references: [id])
+  artistId String
+}
+
+model File {
+  id      String  @id
+  path    String  @unique
+  Track   Track?  @relation(fields: [trackId], references: [id])
+  trackId String?
+}
